@@ -5,6 +5,7 @@ using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using TMPro;
 using System;
+using DG.Tweening;
 
 public class LevelController : MonoBehaviour
 {

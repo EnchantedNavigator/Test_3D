@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using DG.Tweening;
 
 public class Missions_Screen : Base_Screen
 {
@@ -10,10 +11,15 @@ public class Missions_Screen : Base_Screen
     private List<MissionButton> missions;
     [SerializeField]
     private Button okButton;
+    [SerializeField] GameObject loadingScreen;
     private int okButtonMissionId;
     private bool isOkButtonHasMissionId;
     private MissionButton _chosenMission;
     private MissionButton _previousChosenMission;
+   // [SerializeField] SceneController sceneController;
+    [SerializeField] GameObject pannelForAnimation;
+    Tween fromBottom;
+    Tween goUp;
     private void Awake()
     {
         missions.ForEach(x => x.myManager = this);
@@ -22,6 +28,7 @@ public class Missions_Screen : Base_Screen
     {
         okButton.interactable = false;
         isOkButtonHasMissionId = false;
+        loadingScreen.SetActive(false);
         missionDatas = GameData.GetMissionData();
         for (int i = 0; i < missions.Count; i++)
         {
@@ -29,19 +36,39 @@ public class Missions_Screen : Base_Screen
             missions[i].Init(foundData);
         }
     }
+    private void OnEnable()
+    {
+        transform.Translate(0, -1000, 0);
+        ToCenter();
+    }
+
+    public void ToCenter()
+    {
+        fromBottom = transform.DOLocalMoveY(0, (float)0.8).SetEase(Ease.InSine);
+        fromBottom = pannelForAnimation.transform.DOPunchPosition(new Vector3(0, -100, 0), (float)0.5, 2, 1).SetDelay((float)0.8);
+
+
+    }
     public override void Hide()
+    {
+        goUp = transform.DOLocalMoveY(-1000, (float)0.5).SetEase(Ease.InSine);
+        goUp.OnComplete(Disable);
+        
+    }
+    private void Disable()
     {
         gameObject.SetActive(false);
     }
-
     public void SelectMainScreen()
     {
-        MyManager.OpenPanel(ScreenType.Main);
+
         MyManager.ClosePanel(this);
+        MyManager.OpenPanel(ScreenType.Main);
     }
-    public void GoToMission(int id)
+    public void GoToMission()
     {
-        SceneController.GoToMission(id);
+        loadingScreen.SetActive(true);
+        SceneController.Instance.GoToMission(okButtonMissionId);
 
     }
 
@@ -71,7 +98,8 @@ public class Missions_Screen : Base_Screen
     {
         if (isOkButtonHasMissionId == true)
         {
-            GoToMission(okButtonMissionId);
+            Hide();
+            goUp.OnComplete(GoToMission);
             GameManager.Instance.SetCurrentSelectIndexMission(okButtonMissionId);
         }
     }

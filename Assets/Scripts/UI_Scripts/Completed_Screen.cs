@@ -3,9 +3,18 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using DG.Tweening;
+using System;
 
 public class Completed_Screen : Base_Screen
 {
+
+    [SerializeField] GameObject pannelForAnimation;
+    Tween fromBottom;
+    Tween goUp;
+    Tween starsAnimation;
+    Tween starsAnimation2;
+    
     [SerializeField]
     private Button okButton;
     [SerializeField]
@@ -14,22 +23,79 @@ public class Completed_Screen : Base_Screen
     [SerializeField] private Sprite unlockedStar;
     [SerializeField] TMP_Text completeTimeField;
     [SerializeField] TMP_Text enemiesKilledField;
+    [SerializeField] GameObject loadingScreen;
+    [SerializeField] float scoreAnimationDuration;
+    [SerializeField] float scoreAnimationStep;
+
     public void Init(CompleteScore score)
     {
         int amountOfStars = score.Stars;
         amountOfStars = Mathf.Clamp(amountOfStars, 0, stars.Count);
+
         for (int i = 0; i < stars.Count; i++)
         {
-            stars[i].sprite = i < amountOfStars ? unlockedStar : lockedStar;
+            DOTween.Sequence().Append(
+                stars[i].transform.DOScale((float)1.4, scoreAnimationDuration / 2).SetDelay(scoreAnimationDuration / 3).OnComplete(() => ChangeStarSprite(i, amountOfStars)))
+                .Append(stars[i].transform.DOScale((float)1, scoreAnimationDuration / 2).SetDelay(scoreAnimationDuration / 2));
+            //stars[i].sprite = i < amountOfStars ? unlockedStar : lockedStar;
         }
-        completeTimeField.text = " Complete Time: " + score.CompleteTime.ToString();
-        enemiesKilledField.text = " Enemies Killed: " + score.EnemiesKilled.ToString();
-
+        StartCoroutine( AnimateCompleteTimeText(score.CompleteTime,scoreAnimationDuration,(float)scoreAnimationStep, completeTimeField));
+        string EnemiesKilledText = enemiesKilledField.text + score.EnemiesKilled.ToString();
+        StartCoroutine(AnimateEnemiesKilledText(EnemiesKilledText, scoreAnimationDuration, enemiesKilledField));
+    }
+    private void ChangeStarSprite(int id,int amountOfStars)
+    {
+        stars[id].sprite = id < amountOfStars ? unlockedStar : lockedStar;
+    }
+    IEnumerator AnimateCompleteTimeText(float endValue,float duration,float stepSize,TMP_Text textToAnimate)
+    {
+        float n = duration / stepSize;
+        float valuePerIteration = endValue / n;
+        float iterationValue = 0;
+        for ( int i = 0; i<n; i++)
+        {
+            iterationValue += valuePerIteration;
+            textToAnimate.text ="Complete Time: " + string.Format("{0:0.00}",iterationValue);
+            yield return new WaitForSeconds(stepSize);
+        }
+        textToAnimate.text = "Complete Time: " + endValue.ToString();
+    }
+    IEnumerator AnimateEnemiesKilledText(string endValue, float duration, TMP_Text textToAnimate)
+    {
+        float stepSize = duration/endValue.Length;
+        float n = duration / stepSize;
+        string iterationValue = "";
+        for (int i = 0; i < n; i++)
+        {
+            iterationValue += endValue[i];
+            textToAnimate.text = iterationValue;
+            yield return new WaitForSeconds(stepSize);
+        }
+        textToAnimate.text = endValue;
     }
 
     public override void Hide()
     {
+        goUp = transform.DOLocalMoveY(1000, (float)0.5).SetEase(Ease.InSine);
+        goUp.OnComplete(Disable);
+    }
+
+    private void OnEnable()
+    {
+        transform.Translate(0, -1000, 0);
+        ToCenter();
+    }
+    public void ToCenter()
+    {
+        fromBottom = transform.DOLocalMoveY(0, (float)0.8).SetEase(Ease.InSine);
+        fromBottom = pannelForAnimation.transform.DOPunchPosition(new Vector3(0, -100, 0), (float)0.5, 2, 1).SetDelay((float)0.8);
+
+
+    }
+    private void Disable()
+    {
         gameObject.SetActive(false);
+        SelectMainScreen();
     }
 
     public override void Show()
@@ -42,9 +108,10 @@ public class Completed_Screen : Base_Screen
         MyManager.OpenPanel(ScreenType.Mission);
         MyManager.ClosePanel(this);
     }
-    public void SelectMainScreen()
+    private void SelectMainScreen()
     {
-        SceneController.GoToMain();
+        loadingScreen.SetActive(true);
+        SceneController.Instance.GoToMain();
     }
 
 }

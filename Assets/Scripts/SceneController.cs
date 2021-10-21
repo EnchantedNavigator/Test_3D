@@ -2,18 +2,51 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-public static class SceneController 
+public  class SceneController : MonoBehaviour
 {
-    public static void GoToMain()
+    public event System.EventHandler<AsyncOperation> OnLoadedAsyncScene;
+
+    //[SerializeField] GameObject loadingScreen;
+    public static SceneController Instance { get; private set; }
+    private int idOfSceneToLoad;
+    private void Awake()
     {
-        SceneManager.LoadScene(0);
+        if (Instance != null)
+        {
+            Destroy(gameObject);
+            return;
+        }
+        Instance = this;
+        DontDestroyOnLoad(gameObject);
+
+    }
+   
+        IEnumerator LoadAsync()
+    {
+        //loadingScreen.SetActive(true);
+        AsyncOperation asyncLoad = SceneManager.LoadSceneAsync(idOfSceneToLoad);
+        asyncLoad.allowSceneActivation = false;
+        while (!asyncLoad.isDone)
+        {
+            OnLoadedAsyncScene?.Invoke(this, asyncLoad);
+            yield return null;
+        }
+        OnLoadedAsyncScene?.Invoke(this, asyncLoad);
+
     }
 
-    public static void GoToMission(int id)
+    public void GoToMain()
     {
-        GameManager.Instance.SetCurrentSelectIndexMission(id);
-        SceneManager.LoadScene(1);
+        idOfSceneToLoad = 0;
+        StartCoroutine(LoadAsync());
 
+    }
+
+    public void GoToMission(int id)
+    {
+        idOfSceneToLoad = 1;
+        GameManager.Instance.SetCurrentSelectIndexMission(id);
+        StartCoroutine(LoadAsync());
     }
 
 }

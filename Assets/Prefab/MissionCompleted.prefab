@@ -65,7 +65,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Enemies Killed ...
+  m_text: 'Enemies Killed: '
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 671a0b242f6d72049a57f94f0f74b726, type: 2}
   m_sharedMaterial: {fileID: 3215090731552006020, guid: 671a0b242f6d72049a57f94f0f74b726, type: 2}
@@ -95,9 +95,9 @@ MonoBehaviour:
   m_fontSize: 36
   m_fontSizeBase: 36
   m_fontWeight: 400
-  m_enableAutoSizing: 0
+  m_enableAutoSizing: 1
   m_fontSizeMin: 18
-  m_fontSizeMax: 72
+  m_fontSizeMax: 36
   m_fontStyle: 0
   m_HorizontalAlignment: 2
   m_VerticalAlignment: 512
@@ -221,13 +221,14 @@ GameObject:
   - component: {fileID: 3633033213846036059}
   - component: {fileID: 3633033213846036058}
   - component: {fileID: 3633033213846036036}
+  - component: {fileID: 873647068262164598}
   m_Layer: 5
   m_Name: MissionCompleted
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &3633033213846036057
 RectTransform:
   m_ObjectHideFlags: 0
@@ -237,7 +238,7 @@ RectTransform:
   m_GameObject: {fileID: 3633033213846036056}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 2, y: 2, z: 1}
   m_Children:
   - {fileID: 3633033215033733231}
   m_Father: {fileID: 0}
@@ -269,7 +270,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 0.392}
+  m_Color: {r: 1, g: 1, b: 1, a: 0}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -302,6 +303,7 @@ MonoBehaviour:
   MyManager: {fileID: 0}
   key: 
   type: 3
+  pannelForAnimation: {fileID: 3633033215033733230}
   okButton: {fileID: 3633033214889606955}
   stars:
   - {fileID: 3633033213694371558}
@@ -311,6 +313,23 @@ MonoBehaviour:
   unlockedStar: {fileID: 21300000, guid: 127399b43a3afd848a1d98930c82e072, type: 3}
   completeTimeField: {fileID: 3633033214145071866}
   enemiesKilledField: {fileID: 3633033213664413872}
+  loadingScreen: {fileID: 0}
+  scoreAnimationDuration: 2
+  scoreAnimationStep: 0.01
+--- !u!114 &873647068262164598
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3633033213846036056}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 96e9d1976b603d2428dcbc2564931e5d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  goToBottom: 1
+  _myPannel: {fileID: 3633033215033733230}
 --- !u!1 &3633033213913529393
 GameObject:
   m_ObjectHideFlags: 0
@@ -617,9 +636,9 @@ MonoBehaviour:
   m_fontSize: 36
   m_fontSizeBase: 36
   m_fontWeight: 400
-  m_enableAutoSizing: 0
+  m_enableAutoSizing: 1
   m_fontSizeMin: 18
-  m_fontSizeMax: 72
+  m_fontSizeMax: 36
   m_fontStyle: 0
   m_HorizontalAlignment: 2
   m_VerticalAlignment: 512
@@ -965,7 +984,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 3633033213846036036}
         m_TargetAssemblyTypeName: Completed_Screen, Assembly-CSharp
-        m_MethodName: SelectMainScreen
+        m_MethodName: Hide
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -1002,7 +1021,7 @@ RectTransform:
   m_GameObject: {fileID: 3633033215033733230}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 0.5, y: 0.5, z: 1}
   m_Children:
   - {fileID: 3633033214207094627}
   - {fileID: 3633033215569894135}
@@ -1014,7 +1033,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0.9460144, y: 137.06706}
+  m_AnchoredPosition: {x: 0.9460144, y: 4}
   m_SizeDelta: {x: 680, y: 600}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &3633033215033733225
