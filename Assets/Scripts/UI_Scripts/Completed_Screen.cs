@@ -12,8 +12,6 @@ public class Completed_Screen : Base_Screen
     [SerializeField] GameObject pannelForAnimation;
     Tween fromBottom;
     Tween goUp;
-    Tween starsAnimation;
-    Tween starsAnimation2;
     
     [SerializeField]
     private Button okButton;
@@ -31,21 +29,29 @@ public class Completed_Screen : Base_Screen
     {
         int amountOfStars = score.Stars;
         amountOfStars = Mathf.Clamp(amountOfStars, 0, stars.Count);
-
-        for (int i = 0; i < stars.Count; i++)
-        {
-            DOTween.Sequence().Append(
-                stars[i].transform.DOScale((float)1.4, scoreAnimationDuration / 2).SetDelay(scoreAnimationDuration / 3).OnComplete(() => ChangeStarSprite(i, amountOfStars)))
-                .Append(stars[i].transform.DOScale((float)1, scoreAnimationDuration / 2).SetDelay(scoreAnimationDuration / 2));
-            //stars[i].sprite = i < amountOfStars ? unlockedStar : lockedStar;
-        }
+        StartCoroutine(StarsAnimationCoroutine(amountOfStars));
         StartCoroutine( AnimateCompleteTimeText(score.CompleteTime,scoreAnimationDuration,(float)scoreAnimationStep, completeTimeField));
         string EnemiesKilledText = enemiesKilledField.text + score.EnemiesKilled.ToString();
         StartCoroutine(AnimateEnemiesKilledText(EnemiesKilledText, scoreAnimationDuration, enemiesKilledField));
     }
-    private void ChangeStarSprite(int id,int amountOfStars)
+    private void StarsAnimate(int id,int amountOfStars)
     {
+
         stars[id].sprite = id < amountOfStars ? unlockedStar : lockedStar;
+
+    }
+    private IEnumerator StarsAnimationCoroutine(int amountOfStars )
+    {
+
+        for (int i = 0; i < amountOfStars; i++)
+        {
+            Tween stars1 = stars[i].transform.DOScale((float)1.4, scoreAnimationDuration / 2).SetDelay(scoreAnimationDuration / 4);
+            Tween stars2 = stars[i].transform.DOScale((float)1, scoreAnimationDuration / 2).SetDelay((scoreAnimationDuration / 4) + scoreAnimationDuration/2);
+
+            yield return stars1.WaitForCompletion();
+            StarsAnimate(i, amountOfStars);
+        }
+
     }
     IEnumerator AnimateCompleteTimeText(float endValue,float duration,float stepSize,TMP_Text textToAnimate)
     {

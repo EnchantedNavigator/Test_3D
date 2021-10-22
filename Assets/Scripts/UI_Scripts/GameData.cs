@@ -7,7 +7,8 @@ public static class GameData
 {
     private const int CountMissions = 8;
     private const string MissionSaveKey = "MissionSaveKey";
-    
+
+
     public static void AddMission(MissionData data)
     {
         List<MissionData> missionDatas = GetMissionData();
@@ -24,28 +25,40 @@ public static class GameData
         {
             missionDatas.Add(data);
         }
-        Save(missionDatas);
+        Save(missionDatas,MissionSaveKey);
     }
-    public static void Save(List<MissionData> data)
+    public static void Save<T>(T data,string key)
     {
         string json = JsonConvert.SerializeObject(data);
-        PlayerPrefs.SetString(MissionSaveKey, json);
+        PlayerPrefs.SetString(key, json);
 
     }
+    public static T Load<T>( string key,System.Action onDataNull = null)
+    {
+        T result = default;
+        if(PlayerPrefs.HasKey(key))
+        {
+            string json = PlayerPrefs.GetString(key);
+            result = JsonConvert.DeserializeObject<T>(json);
+        }
+        else
+        {
+            onDataNull?.Invoke();
+           
+        }
+        return result;
+    }
+
 
     public static List<MissionData> GetMissionData()
     {
         List<MissionData> result;
-        if ( PlayerPrefs.HasKey(MissionSaveKey))
-        {
-            string json = PlayerPrefs.GetString(MissionSaveKey);
-            result = JsonConvert.DeserializeObject<List<MissionData>>(json);
-        }
-        else
+        result = Load<List<MissionData>>(MissionSaveKey);
+        if (result.Count < 1 )
         {
             result = new List<MissionData>();
             result.Add(new MissionData() { Id = 0, IsLocked = false, Stars = 0 });
-            Save(result);
+            Save(result,MissionSaveKey);
         }
         return result;
     }

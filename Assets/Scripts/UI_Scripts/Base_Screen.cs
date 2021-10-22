@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public enum ScreenType { Main,Mission,Game,Completed};
+public enum ScreenType { Main,Mission,Game,Completed,Settings};
 public abstract class Base_Screen : MonoBehaviour
 {
     [SerializeField]
